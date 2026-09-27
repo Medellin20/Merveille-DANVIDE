@@ -1,84 +1,57 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePortfolioContent } from "@/lib/portfolioContent";
 import {
   ArrowDownRight,
   ArrowUpRight,
-  BarChart3,
-  BriefcaseBusiness,
   Check,
   ChevronRight,
   CircleDot,
-  Download,
   Layers3,
   LineChart,
   Mail,
   Menu,
-  Sparkles,
   Target,
   X,
 } from "lucide-react";
-
-const expertise = [
-  {
-    number: "01",
-    icon: LineChart,
-    title: "Pilotage de la performance",
-    text: "Transformer les données en décisions lisibles, actionnables et alignées sur les priorités de l’organisation.",
-    accent: "yellow",
-  },
-  {
-    number: "02",
-    icon: Target,
-    title: "Stratégie & développement",
-    text: "Structurer une vision, clarifier les arbitrages et faire avancer les projets avec méthode et précision.",
-    accent: "blue",
-  },
-  {
-    number: "03",
-    icon: Layers3,
-    title: "Gestion de projet",
-    text: "Coordonner les parties prenantes, sécuriser les délais et donner un rythme durable à l’exécution.",
-    accent: "black",
-  },
-];
-
-const cases = [
-  { tag: "STRATÉGIE", title: "Réinventer le récit d’une structure engagée", year: "2025", color: "yellow" },
-  { tag: "PERFORMANCE", title: "Rendre les indicateurs utiles au quotidien", year: "2024", color: "blue" },
-  { tag: "COORDINATION", title: "Mettre en mouvement un écosystème", year: "2023", color: "ink" },
-];
-
-const steps = [
-  ["01", "Écouter", "Comprendre le terrain, les enjeux et les signaux faibles."],
-  ["02", "Clarifier", "Faire émerger l’essentiel et une direction commune."],
-  ["03", "Structurer", "Installer le cadre, les priorités et les bons indicateurs."],
-  ["04", "Déployer", "Passer de l’intention à l’impact, avec exigence."],
-];
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { content } = usePortfolioContent();
   const iconMap = { chart: LineChart, target: Target, layers: Layers3 };
+  const initials = content.identity.name
+    .trim()
+    .split(/\s+/)
+    .map((part) => part.charAt(0))
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    document.title = content.siteText.pageTitle;
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute("content", content.siteText.pageDescription);
+  }, [content.siteText.pageDescription, content.siteText.pageTitle]);
 
   return (
     <div className="min-h-screen overflow-hidden bg-[#f6f3ee] text-[#111619]">
       <div className="bg-[#e9bb22] px-5 py-2.5 text-center text-[10px] font-bold uppercase tracking-[0.24em] text-[#111619]">
-        {content.hero.availability} · économie · gestion · stratégie
+        {content.hero.availability}
       </div>
 
       <header className="absolute inset-x-0 top-10 z-30 border-b border-white/15 text-white">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between px-5 py-5 lg:px-8">
           <a href="#top" className="group flex items-center gap-3" onClick={closeMenu}>
-            <span className="flex h-9 w-9 items-center justify-center bg-[#e9bb22] text-sm font-black text-[#111619] transition-transform duration-200 group-hover:rotate-6">MD</span>
+            <span className="flex h-9 w-9 items-center justify-center bg-[#e9bb22] text-sm font-black text-[#111619] transition-transform duration-200 group-hover:rotate-6">{initials}</span>
             <span className="hidden text-xs font-bold uppercase tracking-[0.26em] sm:block">{content.identity.firstName}<br /><span className="font-normal tracking-[0.18em] text-white/60">{content.identity.name.replace(`${content.identity.firstName} `, "")}</span></span>
           </a>
 
           <nav className="hidden items-center gap-9 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70 md:flex">
-            <a className="transition-colors hover:text-[#e9bb22]" href="#expertise">Expertise</a>
-            <a className="transition-colors hover:text-[#e9bb22]" href="#parcours">Parcours</a>
-            <a className="transition-colors hover:text-[#e9bb22]" href="#contact">Contact</a>
+            <a className="transition-colors hover:text-[#e9bb22]" href="#expertise">{content.siteText.navigation.expertise}</a>
+            <a className="transition-colors hover:text-[#e9bb22]" href="#parcours">{content.siteText.navigation.career}</a>
+            <a className="transition-colors hover:text-[#e9bb22]" href="#contact">{content.siteText.navigation.contact}</a>
           </nav>
 
           <button className="text-white md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Ouvrir le menu">
@@ -89,9 +62,9 @@ export default function Home() {
         {menuOpen && (
           <div className="border-t border-white/15 bg-[#111619] px-5 py-6 md:hidden">
             <div className="flex flex-col gap-5 text-xs font-bold uppercase tracking-[0.2em] text-white/75">
-              <a href="#expertise" onClick={closeMenu}>Expertise</a>
-              <a href="#parcours" onClick={closeMenu}>Parcours</a>
-              <a href="#contact" onClick={closeMenu}>Contact</a>
+              <a href="#expertise" onClick={closeMenu}>{content.siteText.navigation.expertise}</a>
+              <a href="#parcours" onClick={closeMenu}>{content.siteText.navigation.career}</a>
+              <a href="#contact" onClick={closeMenu}>{content.siteText.navigation.contact}</a>
             </div>
           </div>
         )}
@@ -115,10 +88,10 @@ export default function Home() {
               </p>
               <div className="mt-11 flex flex-wrap items-center gap-4">
                 <a href="#expertise" className="group inline-flex items-center gap-3 bg-[#e9bb22] px-6 py-4 text-[11px] font-black uppercase tracking-[0.17em] text-[#111619] transition-transform duration-200 hover:-translate-y-1 active:scale-[.98]">
-                  Découvrir mon approche <ArrowDownRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:translate-y-1" />
+                  {content.siteText.hero.primaryAction} <ArrowDownRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:translate-y-1" />
                 </a>
                 <a href="#contact" className="inline-flex items-center gap-2 px-3 py-4 text-[11px] font-bold uppercase tracking-[0.17em] text-white/70 transition-colors hover:text-white">
-                  Prendre contact <ChevronRight className="h-4 w-4" />
+                  {content.siteText.hero.secondaryAction} <ChevronRight className="h-4 w-4" />
                 </a>
               </div>
             </div>
@@ -135,13 +108,13 @@ export default function Home() {
                   />
                 </div>
                 <div className="relative z-10 flex items-start justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-[0.24em]">Étude de profil</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.24em]">{content.siteText.hero.cardLabel}</span>
                   <span className="flex h-8 w-8 items-center justify-center bg-[#111619] text-[10px] font-bold text-[#e9bb22]">01</span>
                 </div>
                 <div className="relative z-10 mt-24 flex max-w-[58%] items-end justify-between">
                   <div>
-                    <p className="font-serif text-5xl tracking-[-.06em]">MD</p>
-                    <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#111619]/55">Économie & gestion</p>
+                    <p className="font-serif text-5xl tracking-[-.06em]">{initials}</p>
+                    <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#111619]/55">{content.siteText.hero.cardProfession}</p>
                   </div>
                   <div className="flex items-end gap-1 pb-1">
                     {[36, 52, 42, 78, 64, 93].map((height, index) => <span key={index} className={index === 5 ? "w-2 bg-[#e9bb22]" : "w-2 bg-[#111619]"} style={{ height }} />)}
@@ -149,13 +122,13 @@ export default function Home() {
                 </div>
                 <div className="mt-8 border-t border-[#111619]/15 pt-5">
                   <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.16em]">
-                    <span>Vision · Rigueur · Impact</span>
+                    <span>{content.siteText.hero.cardMotto}</span>
                     <CircleDot className="h-4 w-4 text-[#e9bb22]" />
                   </div>
                 </div>
               </div>
               <div className="absolute -bottom-5 -right-5 bg-[#e9bb22] px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-[#111619] shadow-lg">
-                Faire mieux,<br />faire juste.
+                {content.siteText.hero.cardBadge.split("\n").map((line, index) => <span key={index}>{index > 0 && <br />}{line}</span>)}
               </div>
             </div>
           </div>
@@ -178,7 +151,7 @@ export default function Home() {
               <div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#111619]/45"><span className="h-px w-8 bg-[#e9bb22]" /> {content.expertiseIntro.label}</div>
               <h2 className="max-w-sm whitespace-pre-line font-serif text-5xl leading-[.95] tracking-[-.055em] md:text-6xl">{content.expertiseIntro.title}</h2>
               <p className="mt-7 max-w-sm text-sm leading-7 text-[#111619]/60">{content.expertiseIntro.text}</p>
-              <a href="#parcours" className="mt-9 inline-flex items-center gap-2 border-b border-[#111619] pb-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:border-[#e9bb22] hover:text-[#6b5710]">Voir le parcours <ArrowUpRight className="h-3.5 w-3.5" /></a>
+              <a href="#parcours" className="mt-9 inline-flex items-center gap-2 border-b border-[#111619] pb-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:border-[#e9bb22] hover:text-[#6b5710]">{content.siteText.expertiseLink} <ArrowUpRight className="h-3.5 w-3.5" /></a>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
               {content.expertise.map((item, index) => {
@@ -193,13 +166,13 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-[#e9bb22] px-5 py-4 text-center text-[11px] font-black uppercase tracking-[0.22em] text-[#111619]">Précision dans l’analyse · exigence dans l’exécution · sens dans l’impact</section>
+        <section className="bg-[#e9bb22] px-5 py-4 text-center text-[11px] font-black uppercase tracking-[0.22em] text-[#111619]">{content.siteText.transition}</section>
 
         <section id="parcours" className="bg-[#111619] px-5 py-24 text-white lg:py-32">
           <div className="mx-auto max-w-[1240px] lg:px-3">
             <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row md:items-end">
-              <div><div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#85cce3]"><span className="h-px w-8 bg-[#85cce3]" /> Parcours</div><h2 className="max-w-xl font-serif text-5xl leading-[.95] tracking-[-.055em] md:text-6xl">Des expériences qui<br /><em className="font-light text-[#85cce3]">donnent du relief.</em></h2></div>
-              <p className="max-w-xs text-sm leading-7 text-white/50">Chaque mission est une occasion de rendre les organisations plus lisibles, plus agiles et plus fortes.</p>
+              <div><div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#85cce3]"><span className="h-px w-8 bg-[#85cce3]" /> {content.siteText.career.label}</div><h2 className="max-w-xl whitespace-pre-line font-serif text-5xl leading-[.95] tracking-[-.055em] md:text-6xl">{content.siteText.career.title}<br /><em className="font-light text-[#85cce3]">{content.siteText.career.accent}</em></h2></div>
+              <p className="max-w-xs text-sm leading-7 text-white/50">{content.siteText.career.summary}</p>
             </div>
             <div className="border-t border-white/15">
               {content.experiences.map(({ date, title, text }) => <div key={`${date}-${title}`} className="grid gap-5 border-b border-white/15 py-8 md:grid-cols-[.28fr_1fr_1fr] md:items-center md:gap-10"><div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.18em] text-[#e9bb22]"><span className="h-2 w-2 rounded-full bg-[#e9bb22]" /> {date}</div><h3 className="font-serif text-2xl tracking-[-.03em] md:text-3xl">{title}</h3><p className="max-w-sm text-sm leading-6 text-white/50">{text}</p></div>)}
@@ -208,18 +181,18 @@ export default function Home() {
         </section>
 
         <section className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
-          <div className="mb-14 flex items-end justify-between"><div><div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#111619]/45"><span className="h-px w-8 bg-[#e9bb22]" /> Sélection</div><h2 className="font-serif text-5xl tracking-[-.055em] md:text-6xl">Projets choisis</h2></div><span className="hidden text-[11px] font-bold uppercase tracking-[0.16em] text-[#111619]/35 md:block">2023 — 2025</span></div>
+          <div className="mb-14 flex items-end justify-between"><div><div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#111619]/45"><span className="h-px w-8 bg-[#e9bb22]" /> {content.siteText.projects.label}</div><h2 className="font-serif text-5xl tracking-[-.055em] md:text-6xl">{content.siteText.projects.title}</h2></div><span className="hidden text-[11px] font-bold uppercase tracking-[0.16em] text-[#111619]/35 md:block">{content.siteText.projects.period}</span></div>
           <div className="grid gap-4 md:grid-cols-3">
             {content.projects.map((item, index) => <article key={`${item.title}-${index}`} className={`group relative min-h-[390px] overflow-hidden p-7 ${item.color === 'yellow' ? 'bg-[#e9bb22]' : item.color === 'blue' ? 'bg-[#85cce3]' : 'bg-[#d9d4cb]'}`}><div className="flex items-start justify-between"><span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#111619]/60">{item.tag}</span><span className="text-[11px] font-bold text-[#111619]/55">0{index + 1}</span></div><div className="absolute inset-x-7 bottom-7"><div className="mb-8 h-px w-full bg-[#111619]/20" /><h3 className="max-w-[250px] font-serif text-3xl leading-[.98] tracking-[-.04em]">{item.title}</h3><div className="mt-6 flex items-center justify-between"><span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#111619]/55">{item.year}</span><span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#111619]/30 transition-all duration-200 group-hover:-translate-y-1 group-hover:translate-x-1"><ArrowUpRight className="h-4 w-4" /></span></div></div><div className="pointer-events-none absolute -right-10 top-20 h-40 w-40 rounded-full border-[22px] border-[#111619]/10 transition-transform duration-500 group-hover:scale-125" /></article>)}
           </div>
         </section>
 
         <section className="border-y border-[#111619]/10 bg-white px-5 py-24 lg:py-32">
-          <div className="mx-auto grid max-w-[1240px] gap-14 lg:grid-cols-[.7fr_1.3fr] lg:px-3"><div><div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#111619]/45"><span className="h-px w-8 bg-[#e9bb22]" /> Ma méthode</div><h2 className="max-w-sm font-serif text-5xl leading-[.95] tracking-[-.055em]">Simple dans la forme.<br /><em className="font-light">Exigeante sur le fond.</em></h2></div><div className="grid gap-0 border-t border-[#111619]/15 md:grid-cols-2">{steps.map(([num, title, text]) => <div key={num} className="border-b border-[#111619]/15 py-7 md:pr-10"><div className="mb-5 flex items-center justify-between"><span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#e1b31c]">{num}</span><Check className="h-4 w-4 text-[#111619]/25" /></div><h3 className="font-serif text-2xl tracking-[-.03em]">{title}</h3><p className="mt-3 max-w-xs text-xs leading-6 text-[#111619]/55">{text}</p></div>)}</div></div>
+          <div className="mx-auto grid max-w-[1240px] gap-14 lg:grid-cols-[.7fr_1.3fr] lg:px-3"><div><div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#111619]/45"><span className="h-px w-8 bg-[#e9bb22]" /> {content.siteText.methodology.label}</div><h2 className="max-w-sm whitespace-pre-line font-serif text-5xl leading-[.95] tracking-[-.055em]">{content.siteText.methodology.title}<br /><em className="font-light">{content.siteText.methodology.accent}</em></h2></div><div className="grid gap-0 border-t border-[#111619]/15 md:grid-cols-2">{content.siteText.methodology.steps.map(({ number, title, text }) => <div key={number} className="border-b border-[#111619]/15 py-7 md:pr-10"><div className="mb-5 flex items-center justify-between"><span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#e1b31c]">{number}</span><Check className="h-4 w-4 text-[#111619]/25" /></div><h3 className="font-serif text-2xl tracking-[-.03em]">{title}</h3><p className="mt-3 max-w-xs text-xs leading-6 text-[#111619]/55">{text}</p></div>)}</div></div>
         </section>
 
         <section id="contact" className="bg-[#85cce3] px-5 py-24 lg:py-32">
-          <div className="mx-auto grid max-w-[1240px] gap-12 lg:grid-cols-[1fr_.7fr] lg:items-end lg:px-3"><div><div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#111619]/55"><span className="h-px w-8 bg-[#111619]" /> {content.contact.label}</div><h2 className="max-w-2xl whitespace-pre-line font-serif text-6xl leading-[.9] tracking-[-.06em] md:text-8xl">{content.contact.title}</h2></div><div><p className="max-w-sm text-sm leading-7 text-[#111619]/70">{content.contact.text}</p><a href={`mailto:${content.contact.email}`} className="group mt-8 inline-flex items-center gap-3 bg-[#111619] px-6 py-4 text-[11px] font-black uppercase tracking-[0.17em] text-white transition-transform duration-200 hover:-translate-y-1 active:scale-[.98]">Écrire à {content.identity.firstName} <Mail className="h-4 w-4 text-[#e9bb22] transition-transform duration-200 group-hover:translate-x-1" /></a></div></div>
+          <div className="mx-auto grid max-w-[1240px] gap-12 lg:grid-cols-[1fr_.7fr] lg:items-end lg:px-3"><div><div className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.26em] text-[#111619]/55"><span className="h-px w-8 bg-[#111619]" /> {content.contact.label}</div><h2 className="max-w-2xl whitespace-pre-line font-serif text-6xl leading-[.9] tracking-[-.06em] md:text-8xl">{content.contact.title}</h2></div><div><p className="max-w-sm text-sm leading-7 text-[#111619]/70">{content.contact.text}</p>          <a href={`mailto:${content.contact.email}`} className="group mt-8 inline-flex items-center gap-3 bg-[#111619] px-6 py-4 text-[11px] font-black uppercase tracking-[0.17em] text-white transition-transform duration-200 hover:-translate-y-1 active:scale-[.98]">{content.contact.buttonLabel} {content.identity.firstName} <Mail className="h-4 w-4 text-[#e9bb22] transition-transform duration-200 group-hover:translate-x-1" /></a></div></div>
         </section>
       </main>
 
@@ -239,16 +212,16 @@ export default function Home() {
           </div>
 
           <div>
-            <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-[#e9bb22]">Navigation</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-[#e9bb22]">{content.siteText.footer.navigationTitle}</h2>
             <nav aria-label="Navigation de pied de page" className="mt-5 flex flex-col items-start gap-3 text-sm text-white/65">
-              <a href="#expertise" className="transition-colors hover:text-white">Expertise</a>
-              <a href="#parcours" className="transition-colors hover:text-white">Parcours</a>
-              <a href="#contact" className="transition-colors hover:text-white">Contact</a>
+              <a href="#expertise" className="transition-colors hover:text-white">{content.siteText.navigation.expertise}</a>
+              <a href="#parcours" className="transition-colors hover:text-white">{content.siteText.navigation.career}</a>
+              <a href="#contact" className="transition-colors hover:text-white">{content.siteText.navigation.contact}</a>
             </nav>
           </div>
 
           <div>
-            <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-[#e9bb22]">Restons en contact</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-[#e9bb22]">{content.siteText.footer.contactTitle}</h2>
             <a href={`mailto:${content.identity.email}`} className="mt-5 inline-flex items-center gap-2 text-sm text-white/65 transition-colors hover:text-white">
               {content.identity.email}
               <ArrowUpRight className="h-4 w-4 text-[#85cce3]" />
@@ -256,8 +229,8 @@ export default function Home() {
           </div>
         </div>
         <div className="relative mx-auto mt-12 flex max-w-[1240px] flex-col gap-3 border-t border-white/10 pt-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35 sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} {content.identity.name}. Tous droits réservés.</span>
-          <a href="#top" className="transition-colors hover:text-white">Retour en haut ↑</a>
+          <span>© {new Date().getFullYear()} {content.identity.name}. {content.siteText.footer.copyright}</span>
+          <a href="#top" className="transition-colors hover:text-white">{content.siteText.footer.backToTop} ↑</a>
         </div>
       </footer>
     </div>

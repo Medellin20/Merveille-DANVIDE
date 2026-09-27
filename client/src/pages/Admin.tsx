@@ -10,7 +10,6 @@ import {
   FileText,
   Globe2,
   LayoutDashboard,
-  Minus,
   Pencil,
   Plus,
   RotateCcw,
@@ -29,7 +28,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
-type Tab = "Vue d’ensemble" | "Contenu" | "Projets" | "Réglages";
+type Tab = "Contenu" | "Projets";
 
 const activity = [
   ["01", "Profil mis à jour", "Il y a 2 heures", "yellow"],
@@ -99,7 +98,7 @@ function SectionTitle({
 }
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState<Tab>("Vue d’ensemble");
+  const [activeTab, setActiveTab] = useState<Tab>("Contenu");
   const { content, setContent } = usePortfolioContent();
   const [saved, setSaved] = useState(false);
   const saveMutation = trpc.portfolio.save.useMutation();
@@ -187,14 +186,20 @@ export default function Admin() {
                   ? "Sauvegardé"
                   : "Sauvegarder"}
             </Button>
+            <button
+              onClick={restoreDefaults}
+              disabled={resetMutation.isPending}
+              className="inline-flex items-center gap-2 px-2 py-2.5 text-[10px] font-black uppercase tracking-[0.12em] text-[#111619]/45 hover:text-[#111619] disabled:opacity-50"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              {resetMutation.isPending ? "Restauration…" : "Valeurs initiales"}
+            </button>
           </div>
         </header>
 
         <div className="mx-auto mt-7 max-w-[1380px]">
           <div className="mb-8 flex gap-6 overflow-x-auto border-b border-[#111619]/10 text-[10px] font-black uppercase tracking-[0.17em]">
-            {(
-              ["Vue d’ensemble", "Contenu", "Projets", "Réglages"] as Tab[]
-            ).map((tab) => (
+            {(["Contenu", "Projets"] as Tab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -205,13 +210,6 @@ export default function Admin() {
             ))}
           </div>
 
-          {activeTab === "Vue d’ensemble" && (
-            <Overview
-              content={content}
-              onContent={() => setActiveTab("Contenu")}
-              onProjects={() => setActiveTab("Projets")}
-            />
-          )}
           {activeTab === "Contenu" && (
             <ContentEditor content={content} patch={patch} />
           )}
@@ -220,52 +218,6 @@ export default function Admin() {
               projects={content.projects}
               onChange={(projects) => patch("projects", projects)}
             />
-          )}
-          {activeTab === "Réglages" && (
-            <section className="max-w-3xl bg-white p-6 md:p-8">
-              <SectionTitle
-                eyebrow="Préférences du studio"
-                title="Réglages du portfolio"
-                action={
-                  <button
-                    onClick={restoreDefaults}
-                    disabled={resetMutation.isPending}
-                    className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.12em] text-[#111619]/45 hover:text-[#111619] disabled:opacity-50"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />{" "}
-                    {resetMutation.isPending
-                      ? "Réinitialisation…"
-                      : "Réinitialiser"}
-                  </button>
-                }
-              />
-              <div className="mt-8 space-y-5">
-                {[
-                  "Recevoir les notifications de contact",
-                  "Afficher la disponibilité sur le site",
-                  "Activer les statistiques de visite",
-                ].map((setting, index) => (
-                  <div
-                    key={setting}
-                    className="flex items-center justify-between border-b border-[#111619]/10 pb-5"
-                  >
-                    <div>
-                      <p className="text-sm font-bold">{setting}</p>
-                      <p className="mt-1 text-xs text-[#111619]/45">
-                        Cette option s’applique immédiatement à la vitrine.
-                      </p>
-                    </div>
-                    <button
-                      className={`relative h-6 w-11 rounded-full transition-colors ${index !== 1 ? "bg-[#111619]" : "bg-[#111619]/15"}`}
-                    >
-                      <span
-                        className={`absolute top-1 h-4 w-4 rounded-full transition-transform ${index !== 1 ? "translate-x-6 bg-[#e9bb22]" : "translate-x-1 bg-white"}`}
-                      />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
           )}
         </div>
       </div>
@@ -489,6 +441,21 @@ function ContentEditor({
     key: keyof PortfolioContent["contact"],
     value: string,
   ) => patch("contact", { ...content.contact, [key]: value });
+  const updateSiteText = <K extends keyof PortfolioContent["siteText"]>(
+    key: K,
+    value: PortfolioContent["siteText"][K],
+  ) => patch("siteText", { ...content.siteText, [key]: value });
+  const updateMethodStep = (
+    index: number,
+    key: keyof PortfolioContent["siteText"]["methodology"]["steps"][number],
+    value: string,
+  ) =>
+    updateSiteText("methodology", {
+      ...content.siteText.methodology,
+      steps: content.siteText.methodology.steps.map((step, stepIndex) =>
+        stepIndex === index ? { ...step, [key]: value } : step,
+      ),
+    });
   const updateMetric = (index: number, key: "value" | "label", value: string) =>
     patch(
       "metrics",
@@ -586,6 +553,50 @@ function ContentEditor({
             onChange={(value) => updateIdentity("profileImage", value)}
             placeholder="https://…"
           />
+          <div>
+            <label className="block">
+              <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#111619]/45">
+                Ou importer une photo (JPEG, PNG ou WebP, 2 Mo maximum)
+              </span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="mt-2 block w-full text-sm file:mr-4 file:border-0 file:bg-[#e9bb22] file:px-4 file:py-2 file:text-xs file:font-bold"
+                onChange={(event) => {
+                  const input = event.currentTarget;
+                  const file = input.files?.[0];
+                  input.value = "";
+                  if (!file) return;
+
+                  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+                    toast.error("Format de photo non accepté.");
+                    return;
+                  }
+                  if (file.size > 2 * 1024 * 1024) {
+                    toast.error("La photo doit faire 2 Mo maximum.");
+                    return;
+                  }
+
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    if (typeof reader.result === "string") {
+                      updateIdentity("profileImage", reader.result);
+                    } else {
+                      toast.error("Impossible de lire cette photo.");
+                    }
+                  };
+                  reader.onerror = () =>
+                    toast.error("Impossible de lire cette photo.");
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </label>
+            <img
+              src={content.identity.profileImage || "/portrait.png"}
+              alt={`Aperçu du portrait de ${content.identity.name}`}
+              className="mt-4 h-40 w-32 border border-[#111619]/10 object-cover object-top"
+            />
+          </div>
         </div>
       </section>
 
@@ -619,6 +630,383 @@ function ContentEditor({
             value={content.hero.availability}
             onChange={(value) => updateHero("availability", value)}
           />
+        </div>
+      </section>
+
+      <section className="bg-white p-6 md:p-8">
+        <SectionTitle
+          eyebrow="Textes complémentaires"
+          title="Navigation, sections et pied de page"
+        />
+        <div className="mt-7 space-y-8">
+          <div>
+            <h3 className="text-xs font-black uppercase tracking-[0.14em] text-[#111619]/55">
+              Navigation et boutons
+            </h3>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field
+                label="Lien expertise"
+                value={content.siteText.navigation.expertise}
+                onChange={(value) =>
+                  updateSiteText("navigation", {
+                    ...content.siteText.navigation,
+                    expertise: value,
+                  })
+                }
+              />
+              <Field
+                label="Lien parcours"
+                value={content.siteText.navigation.career}
+                onChange={(value) =>
+                  updateSiteText("navigation", {
+                    ...content.siteText.navigation,
+                    career: value,
+                  })
+                }
+              />
+              <Field
+                label="Lien contact"
+                value={content.siteText.navigation.contact}
+                onChange={(value) =>
+                  updateSiteText("navigation", {
+                    ...content.siteText.navigation,
+                    contact: value,
+                  })
+                }
+              />
+              <Field
+                label="Lien sous les expertises"
+                value={content.siteText.expertiseLink}
+                onChange={(value) => updateSiteText("expertiseLink", value)}
+              />
+              <Field
+                label="Bouton principal de l’accueil"
+                value={content.siteText.hero.primaryAction}
+                onChange={(value) =>
+                  updateSiteText("hero", {
+                    ...content.siteText.hero,
+                    primaryAction: value,
+                  })
+                }
+              />
+              <Field
+                label="Bouton secondaire de l’accueil"
+                value={content.siteText.hero.secondaryAction}
+                onChange={(value) =>
+                  updateSiteText("hero", {
+                    ...content.siteText.hero,
+                    secondaryAction: value,
+                  })
+                }
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-black uppercase tracking-[0.14em] text-[#111619]/55">
+              Carte de présentation
+            </h3>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field
+                label="Petit titre"
+                value={content.siteText.hero.cardLabel}
+                onChange={(value) =>
+                  updateSiteText("hero", {
+                    ...content.siteText.hero,
+                    cardLabel: value,
+                  })
+                }
+              />
+              <Field
+                label="Domaine affiché"
+                value={content.siteText.hero.cardProfession}
+                onChange={(value) =>
+                  updateSiteText("hero", {
+                    ...content.siteText.hero,
+                    cardProfession: value,
+                  })
+                }
+              />
+              <Field
+                label="Signature"
+                value={content.siteText.hero.cardMotto}
+                onChange={(value) =>
+                  updateSiteText("hero", {
+                    ...content.siteText.hero,
+                    cardMotto: value,
+                  })
+                }
+              />
+              <Field
+                label="Texte du badge"
+                value={content.siteText.hero.cardBadge}
+                onChange={(value) =>
+                  updateSiteText("hero", {
+                    ...content.siteText.hero,
+                    cardBadge: value,
+                  })
+                }
+                multiline
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-black uppercase tracking-[0.14em] text-[#111619]/55">
+              Titres des sections
+            </h3>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field
+                label="Phrase de transition"
+                value={content.siteText.transition}
+                onChange={(value) => updateSiteText("transition", value)}
+              />
+              <Field
+                label="Petit titre parcours"
+                value={content.siteText.career.label}
+                onChange={(value) =>
+                  updateSiteText("career", {
+                    ...content.siteText.career,
+                    label: value,
+                  })
+                }
+              />
+              <Field
+                label="Titre de section parcours"
+                value={content.siteText.career.title}
+                onChange={(value) =>
+                  updateSiteText("career", {
+                    ...content.siteText.career,
+                    title: value,
+                  })
+                }
+              />
+              <Field
+                label="Accent du titre parcours"
+                value={content.siteText.career.accent}
+                onChange={(value) =>
+                  updateSiteText("career", {
+                    ...content.siteText.career,
+                    accent: value,
+                  })
+                }
+              />
+              <Field
+                label="Texte d’introduction du parcours"
+                value={content.siteText.career.summary}
+                onChange={(value) =>
+                  updateSiteText("career", {
+                    ...content.siteText.career,
+                    summary: value,
+                  })
+                }
+                multiline
+              />
+              <Field
+                label="Petit titre projets"
+                value={content.siteText.projects.label}
+                onChange={(value) =>
+                  updateSiteText("projects", {
+                    ...content.siteText.projects,
+                    label: value,
+                  })
+                }
+              />
+              <Field
+                label="Titre de section projets"
+                value={content.siteText.projects.title}
+                onChange={(value) =>
+                  updateSiteText("projects", {
+                    ...content.siteText.projects,
+                    title: value,
+                  })
+                }
+              />
+              <Field
+                label="Période affichée pour les projets"
+                value={content.siteText.projects.period}
+                onChange={(value) =>
+                  updateSiteText("projects", {
+                    ...content.siteText.projects,
+                    period: value,
+                  })
+                }
+              />
+              <Field
+                label="Petit titre méthode"
+                value={content.siteText.methodology.label}
+                onChange={(value) =>
+                  updateSiteText("methodology", {
+                    ...content.siteText.methodology,
+                    label: value,
+                  })
+                }
+              />
+              <Field
+                label="Titre de section méthode"
+                value={content.siteText.methodology.title}
+                onChange={(value) =>
+                  updateSiteText("methodology", {
+                    ...content.siteText.methodology,
+                    title: value,
+                  })
+                }
+              />
+              <Field
+                label="Accent du titre méthode"
+                value={content.siteText.methodology.accent}
+                onChange={(value) =>
+                  updateSiteText("methodology", {
+                    ...content.siteText.methodology,
+                    accent: value,
+                  })
+                }
+              />
+            </div>
+          </div>
+
+          <div>
+            <SectionTitle
+              eyebrow="Étapes"
+              title="Méthode de travail"
+              action={
+                <Button
+                  onClick={() =>
+                    updateSiteText("methodology", {
+                      ...content.siteText.methodology,
+                      steps: [
+                        ...content.siteText.methodology.steps,
+                        {
+                          number: String(content.siteText.methodology.steps.length + 1).padStart(2, "0"),
+                          title: "Nouvelle étape",
+                          text: "Décrivez cette étape.",
+                        },
+                      ],
+                    })
+                  }
+                  className="h-auto rounded-none bg-[#85cce3] px-3 py-2 text-[10px] font-black uppercase text-[#111619] hover:bg-[#9ed9e9]"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Ajouter une étape
+                </Button>
+              }
+            />
+            <div className="mt-5 space-y-4">
+              {content.siteText.methodology.steps.map((step, index) => (
+                <div
+                  key={`${step.number}-${index}`}
+                  className="relative border border-[#111619]/10 p-4"
+                >
+                  <button
+                    onClick={() =>
+                      updateSiteText("methodology", {
+                        ...content.siteText.methodology,
+                        steps: content.siteText.methodology.steps.filter(
+                          (_, stepIndex) => stepIndex !== index,
+                        ),
+                      })
+                    }
+                    className="absolute right-3 top-3 text-[#111619]/25 hover:text-red-600"
+                    aria-label="Supprimer cette étape"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                  <div className="grid gap-3 pr-6 md:grid-cols-[100px_1fr]">
+                    <Field
+                      label="Numéro"
+                      value={step.number}
+                      onChange={(value) =>
+                        updateMethodStep(index, "number", value)
+                      }
+                    />
+                    <Field
+                      label="Titre"
+                      value={step.title}
+                      onChange={(value) =>
+                        updateMethodStep(index, "title", value)
+                      }
+                    />
+                    <div className="md:col-span-2">
+                      <Field
+                        label="Description"
+                        value={step.text}
+                        onChange={(value) =>
+                          updateMethodStep(index, "text", value)
+                        }
+                        multiline
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-black uppercase tracking-[0.14em] text-[#111619]/55">
+              Pied de page
+            </h3>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field
+                label="Titre des liens"
+                value={content.siteText.footer.navigationTitle}
+                onChange={(value) =>
+                  updateSiteText("footer", {
+                    ...content.siteText.footer,
+                    navigationTitle: value,
+                  })
+                }
+              />
+              <Field
+                label="Titre du contact"
+                value={content.siteText.footer.contactTitle}
+                onChange={(value) =>
+                  updateSiteText("footer", {
+                    ...content.siteText.footer,
+                    contactTitle: value,
+                  })
+                }
+              />
+              <Field
+                label="Lien de retour en haut"
+                value={content.siteText.footer.backToTop}
+                onChange={(value) =>
+                  updateSiteText("footer", {
+                    ...content.siteText.footer,
+                    backToTop: value,
+                  })
+                }
+              />
+              <Field
+                label="Mention de droits"
+                value={content.siteText.footer.copyright}
+                onChange={(value) =>
+                  updateSiteText("footer", {
+                    ...content.siteText.footer,
+                    copyright: value,
+                  })
+                }
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-black uppercase tracking-[0.14em] text-[#111619]/55">
+              Référencement de la page
+            </h3>
+            <div className="mt-4 grid gap-4">
+              <Field
+                label="Titre de l’onglet navigateur"
+                value={content.siteText.pageTitle}
+                onChange={(value) => updateSiteText("pageTitle", value)}
+              />
+              <Field
+                label="Description pour les moteurs de recherche"
+                value={content.siteText.pageDescription}
+                onChange={(value) => updateSiteText("pageDescription", value)}
+                multiline
+              />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -818,6 +1206,11 @@ function ContentEditor({
             label="Email de contact"
             value={content.contact.email}
             onChange={(value) => updateContact("email", value)}
+          />
+          <Field
+            label="Texte du bouton contact"
+            value={content.contact.buttonLabel}
+            onChange={(value) => updateContact("buttonLabel", value)}
           />
         </div>
       </section>

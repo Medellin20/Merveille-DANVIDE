@@ -1,6 +1,102 @@
 import { z } from "zod";
 
+const DEFAULT_SITE_TEXT = {
+  navigation: {
+    expertise: "Expertise",
+    career: "Parcours",
+    contact: "Contact",
+  },
+  hero: {
+    primaryAction: "Découvrir mon approche",
+    secondaryAction: "Prendre contact",
+    cardLabel: "Étude de profil",
+    cardProfession: "Économie & gestion",
+    cardMotto: "Vision · Rigueur · Impact",
+    cardBadge: "Faire mieux,\nfaire juste.",
+  },
+  expertiseLink: "Voir le parcours",
+  transition: "Précision dans l’analyse · exigence dans l’exécution · sens dans l’impact",
+  career: {
+    label: "Parcours",
+    title: "Des expériences qui",
+    accent: "donnent du relief.",
+    summary:
+      "Chaque mission est une occasion de rendre les organisations plus lisibles, plus agiles et plus fortes.",
+  },
+  projects: {
+    label: "Sélection",
+    title: "Projets choisis",
+    period: "2023 — 2025",
+  },
+  methodology: {
+    label: "Ma méthode",
+    title: "Simple dans la forme.",
+    accent: "Exigeante sur le fond.",
+    steps: [
+      { number: "01", title: "Écouter", text: "Comprendre le terrain, les enjeux et les signaux faibles." },
+      { number: "02", title: "Clarifier", text: "Faire émerger l’essentiel et une direction commune." },
+      { number: "03", title: "Structurer", text: "Installer le cadre, les priorités et les bons indicateurs." },
+      { number: "04", title: "Déployer", text: "Passer de l’intention à l’impact, avec exigence." },
+    ],
+  },
+  footer: {
+    navigationTitle: "Navigation",
+    contactTitle: "Restons en contact",
+    backToTop: "Retour en haut",
+    copyright: "Tous droits réservés.",
+  },
+  pageTitle: "Merveille Danvide — Économie & Gestion",
+  pageDescription:
+    "Portfolio de Merveille Danvide — économie, gestion et stratégie.",
+};
+
+const siteTextSchema = z.object({
+  navigation: z.object({
+    expertise: z.string(),
+    career: z.string(),
+    contact: z.string(),
+  }),
+  hero: z.object({
+    primaryAction: z.string(),
+    secondaryAction: z.string(),
+    cardLabel: z.string(),
+    cardProfession: z.string(),
+    cardMotto: z.string(),
+    cardBadge: z.string(),
+  }),
+  expertiseLink: z.string(),
+  transition: z.string(),
+  career: z.object({
+    label: z.string(),
+    title: z.string(),
+    accent: z.string(),
+    summary: z.string(),
+  }),
+  projects: z.object({
+    label: z.string(),
+    title: z.string(),
+    period: z.string(),
+  }),
+  methodology: z.object({
+    label: z.string(),
+    title: z.string(),
+    accent: z.string(),
+    steps: z.array(
+      z.object({ number: z.string(), title: z.string(), text: z.string() }),
+    ),
+  }),
+  footer: z.object({
+    navigationTitle: z.string(),
+    contactTitle: z.string(),
+    backToTop: z.string(),
+    copyright: z.string(),
+  }),
+  pageTitle: z.string(),
+  pageDescription: z.string(),
+});
+
 export const portfolioContentSchema = z.object({
+  siteText: siteTextSchema.default(DEFAULT_SITE_TEXT),
   identity: z.object({
     name: z.string(),
     firstName: z.string(),
@@ -46,12 +142,14 @@ export const portfolioContentSchema = z.object({
     title: z.string(),
     text: z.string(),
     email: z.string(),
+    buttonLabel: z.string().default("Écrire à"),
   }),
 });
 
 export type PortfolioContent = z.infer<typeof portfolioContentSchema>;
 
 export const DEFAULT_PORTFOLIO_CONTENT: PortfolioContent = {
+  siteText: DEFAULT_SITE_TEXT,
   identity: {
     name: "Merveille Danvide",
     firstName: "Merveille",
@@ -141,5 +239,6 @@ export const DEFAULT_PORTFOLIO_CONTENT: PortfolioContent = {
     title: "Une idée. Un enjeu. Un impact.",
     text: "Vous cherchez un regard structurant pour un projet stratégique, une transformation ou un nouveau cap ? Échangeons simplement.",
     email: "bonjour@merveille-danvide.fr",
+    buttonLabel: "Écrire à",
   },
 };
