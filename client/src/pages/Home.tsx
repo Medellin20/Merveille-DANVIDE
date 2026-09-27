@@ -223,7 +223,43 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="bg-[#111619] px-5 py-8 text-white lg:px-8"><div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-5 md:flex-row md:items-center"><div className="flex items-center gap-3"><span className="flex h-8 w-8 items-center justify-center bg-[#e9bb22] text-[10px] font-black text-[#111619]">MD</span><span className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/60">Merveille Danvide</span></div><div className="flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.16em] text-white/35"><a href="#top" className="transition-colors hover:text-white">Haut de page</a><span>© 2026</span></div></div></footer>
+      <footer className="relative overflow-hidden bg-[#111619] px-5 py-14 text-white lg:px-8 lg:py-16">
+        <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-[#85cce3]/10 blur-3xl" />
+        <div className="relative mx-auto grid max-w-[1240px] gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
+          <div>
+            <a href="#top" className="inline-flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center bg-[#e9bb22] text-xs font-black text-[#111619]">
+                {content.identity.firstName.slice(0, 1).toUpperCase()}
+                {content.identity.name.split(" ").at(-1)?.slice(0, 1).toUpperCase()}
+              </span>
+              <span className="font-serif text-2xl tracking-[-.03em]">{content.identity.name}</span>
+            </a>
+            <p className="mt-4 max-w-xs text-sm leading-6 text-white/55">{content.identity.role}</p>
+            <p className="mt-1 text-xs uppercase tracking-[0.12em] text-white/35">{content.identity.location}</p>
+          </div>
+
+          <div>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-[#e9bb22]">Navigation</h2>
+            <nav aria-label="Navigation de pied de page" className="mt-5 flex flex-col items-start gap-3 text-sm text-white/65">
+              <a href="#expertise" className="transition-colors hover:text-white">Expertise</a>
+              <a href="#parcours" className="transition-colors hover:text-white">Parcours</a>
+              <a href="#contact" className="transition-colors hover:text-white">Contact</a>
+            </nav>
+          </div>
+
+          <div>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-[#e9bb22]">Restons en contact</h2>
+            <a href={`mailto:${content.identity.email}`} className="mt-5 inline-flex items-center gap-2 text-sm text-white/65 transition-colors hover:text-white">
+              {content.identity.email}
+              <ArrowUpRight className="h-4 w-4 text-[#85cce3]" />
+            </a>
+          </div>
+        </div>
+        <div className="relative mx-auto mt-12 flex max-w-[1240px] flex-col gap-3 border-t border-white/10 pt-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35 sm:flex-row sm:items-center sm:justify-between">
+          <span>© {new Date().getFullYear()} {content.identity.name}. Tous droits réservés.</span>
+          <a href="#top" className="transition-colors hover:text-white">Retour en haut ↑</a>
+        </div>
+      </footer>
     </div>
   );
 }
