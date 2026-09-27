@@ -98,9 +98,10 @@ export default function Home() {
       </header>
 
       <main id="top">
-        <section className="relative bg-[#111619] text-white">
-          <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:72px_72px]" />
-          <div className="absolute -right-28 top-28 h-96 w-96 rounded-full bg-[#85cce3]/10 blur-3xl" />
+        <section className="relative isolate overflow-hidden bg-[#111619] text-white">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_58%,rgba(233,187,34,.2),transparent_36%),radial-gradient(ellipse_at_12%_84%,rgba(133,204,227,.15),transparent_34%),linear-gradient(115deg,#111719_0%,#1b2729_53%,#101416_100%)]" />
+          <div className="pointer-events-none absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_90%)]" />
+          <div className="pointer-events-none absolute -right-28 top-28 h-96 w-96 rounded-full bg-[#e9bb22]/10 blur-3xl" />
           <div className="relative mx-auto grid min-h-[710px] max-w-[1240px] items-end gap-16 px-5 pb-20 pt-44 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pb-24">
             <div className="max-w-3xl">
               <div className="mb-9 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-[#e9bb22]">
@@ -126,14 +127,12 @@ export default function Home() {
               <div className="absolute -left-8 top-9 hidden h-32 w-32 border border-[#e9bb22]/40 sm:block" />
               <div className="relative overflow-hidden bg-[#f6f3ee] p-5 text-[#111619] shadow-2xl shadow-black/25 sm:p-7">
                 <div className="absolute right-0 top-0 h-32 w-32 bg-[#85cce3]/80 mix-blend-multiply" />
-                <div className="absolute right-5 top-16 z-0 h-52 w-32 overflow-hidden border-4 border-[#f6f3ee] bg-[#d9d4cb] shadow-xl sm:right-7 sm:h-56 sm:w-36">
-                  {content.identity.profileImage ? (
-                    <img src={content.identity.profileImage} alt={`Portrait de ${content.identity.name}`} className="h-full w-full object-cover object-top" />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center font-serif text-4xl text-[#111619]/45" role="img" aria-label={`Portrait de ${content.identity.name}`}>
-                      {content.identity.firstName.slice(0, 1).toUpperCase()}
-                    </span>
-                  )}
+                <div className="absolute right-5 top-16 z-0 h-60 w-40 overflow-hidden border-4 border-[#f6f3ee] bg-[#d9d4cb] shadow-xl sm:right-7 sm:h-64">
+                  <img
+                    src={content.identity.profileImage || "/portrait.png"}
+                    alt={`Portrait de ${content.identity.name}`}
+                    className="h-full w-full object-cover object-[center_20%]"
+                  />
                 </div>
                 <div className="relative z-10 flex items-start justify-between">
                   <span className="text-[10px] font-black uppercase tracking-[0.24em]">Étude de profil</span>
