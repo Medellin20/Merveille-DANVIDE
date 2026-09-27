@@ -3,8 +3,6 @@ dist/
 build/
 coverage/
 .vite/
-.manus-logs/
-
 .env
 .env.*
 !.env.example

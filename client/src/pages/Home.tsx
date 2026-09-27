@@ -127,7 +127,13 @@ export default function Home() {
               <div className="relative overflow-hidden bg-[#f6f3ee] p-5 text-[#111619] shadow-2xl shadow-black/25 sm:p-7">
                 <div className="absolute right-0 top-0 h-32 w-32 bg-[#85cce3]/80 mix-blend-multiply" />
                 <div className="absolute right-5 top-16 z-0 h-52 w-32 overflow-hidden border-4 border-[#f6f3ee] bg-[#d9d4cb] shadow-xl sm:right-7 sm:h-56 sm:w-36">
-                  <img src={content.identity.profileImage} alt={`Portrait de ${content.identity.name}`} className="h-full w-full object-cover object-top" />
+                  {content.identity.profileImage ? (
+                    <img src={content.identity.profileImage} alt={`Portrait de ${content.identity.name}`} className="h-full w-full object-cover object-top" />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center font-serif text-4xl text-[#111619]/45" role="img" aria-label={`Portrait de ${content.identity.name}`}>
+                      {content.identity.firstName.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 <div className="relative z-10 flex items-start justify-between">
                   <span className="text-[10px] font-black uppercase tracking-[0.24em]">Étude de profil</span>

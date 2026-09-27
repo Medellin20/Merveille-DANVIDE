@@ -1,4 +1,3 @@
-import { COOKIE_NAME } from "@shared/const";
 import { TRPCError } from "@trpc/server";
 import {
   DEFAULT_PORTFOLIO_CONTENT,
@@ -23,7 +22,6 @@ import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(({ ctx }) => ({
@@ -43,7 +41,7 @@ export const appRouter = router({
           });
         }
 
-        const ip = ctx.req.ip;
+        const ip = ctx.req.ip ?? ctx.req.socket.remoteAddress ?? "unknown";
         if (isAdminLoginRateLimited(ip)) {
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
@@ -67,10 +65,9 @@ export const appRouter = router({
         });
         return { success: true } as const;
       }),
-    logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      ctx.res.clearCookie(ADMIN_SESSION_COOKIE, { ...cookieOptions, maxAge: -1 });
+      logout: publicProcedure.mutation(({ ctx }) => {
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.clearCookie(ADMIN_SESSION_COOKIE, { ...cookieOptions, maxAge: -1 });
       return {
         success: true,
       } as const;

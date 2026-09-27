@@ -58,7 +58,7 @@ export const DEFAULT_PORTFOLIO_CONTENT: PortfolioContent = {
     role: "Économie & gestion",
     email: "bonjour@merveille-danvide.fr",
     location: "France · Afrique de l’Ouest",
-    profileImage: "/manus-storage/WhatsAppImage2026-09-26at23.47.00_3e977a09.jpeg",
+    profileImage: "",
   },
   hero: {
     eyebrow: "Portfolio 2026",

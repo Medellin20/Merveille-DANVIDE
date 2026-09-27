@@ -65,7 +65,7 @@ export function isAdminLoginRateLimited(ip: string, now = Date.now()) {
 }
 
 export function recordFailedAdminLogin(ip: string, now = Date.now()) {
-  for (const [knownIp, attempt] of attemptsByIp) {
+  for (const [knownIp, attempt] of attemptsByIp.entries()) {
     if (attempt.expiresAt <= now) attemptsByIp.delete(knownIp);
   }
   if (!attemptsByIp.has(ip) && attemptsByIp.size >= 10_000) {

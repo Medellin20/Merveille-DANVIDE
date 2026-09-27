@@ -22,7 +22,7 @@ describe("portfolio admin access", () => {
       openId: "portfolio-admin",
       name: "Merveille Danvide",
       email: "bonjour@merveille-danvide.fr",
-      loginMethod: "manus",
+      loginMethod: "legacy",
       role: "admin" as const,
       createdAt: new Date(),
       updatedAt: new Date(),

@@ -9,6 +9,20 @@ import { ENV } from "./_core/env";
 
 let supabaseClient: SupabaseClient | undefined;
 
+export function normalizePortfolioContent(content: PortfolioContent): PortfolioContent {
+  if (!content.identity.profileImage.startsWith("/manus-storage/")) {
+    return content;
+  }
+
+  return {
+    ...content,
+    identity: {
+      ...content.identity,
+      profileImage: "",
+    },
+  };
+}
+
 function getSupabaseClient() {
   if (!ENV.supabaseUrl || !ENV.supabaseServiceRoleKey) {
     throw new TRPCError({
@@ -48,7 +62,7 @@ export async function getSavedPortfolioContent(): Promise<PortfolioContent> {
     });
   }
 
-  return parsedContent.data;
+  return normalizePortfolioContent(parsedContent.data);
 }
 
 export async function savePortfolioContentToSupabase(
