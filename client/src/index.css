@@ -1,0 +1,68 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #f6f3ee;
+  --foreground: #111619;
+  --card: #ffffff;
+  --card-foreground: #111619;
+  --popover: #ffffff;
+  --popover-foreground: #111619;
+  --primary: #111619;
+  --primary-foreground: #ffffff;
+  --secondary: #e9bb22;
+  --secondary-foreground: #111619;
+  --muted: #ece8e1;
+  --muted-foreground: #5d6465;
+  --accent: #85cce3;
+  --accent-foreground: #111619;
+  --destructive: #b94545;
+  --border: rgba(17, 22, 25, .14);
+  --input: rgba(17, 22, 25, .14);
+  --ring: #85cce3;
+  --radius: 0rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  ::selection { background: #e9bb22; color: #111619; }
+}
+
+.font-serif { font-family: "Cormorant Garamond", Georgia, serif; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { animation: fade-up .65s cubic-bezier(.23,1,.32,1) both; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
